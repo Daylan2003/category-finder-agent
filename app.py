@@ -111,7 +111,10 @@ def get_filters_from_agent(user_query: str) -> Dict[str, Any]:
 
 
     # Create a small in-memory runner for this call.
+    #The runner is used to deleiver the message to the LLM
     runner = InMemoryRunner(agent=root_agent, app_name="category_agent")
+
+    #required by ADK
     user_id = "web_user"
 
     async def _run_once() -> List[Any]:
@@ -122,6 +125,7 @@ def get_filters_from_agent(user_query: str) -> Dict[str, Any]:
             user_id=user_id,
         )
 
+        #stores agent responses
         events: List[Any] = []
 
   
@@ -151,11 +155,12 @@ def get_filters_from_agent(user_query: str) -> Dict[str, Any]:
 
 
 
-    #agent should resturn a JSON object string
+    #agent should resturn a JSON object string, so if the agent behaves correctly do that
     try:
         filters = json.loads(final_text)
     except json.JSONDecodeError:
 
+        #Convert prices to none if empty for correct filtering
         filters = {"category": None, "max_price": None, "min_price": None}
 
    
